@@ -7,6 +7,44 @@
   };
 });
 
+
+// ✅ 正在检测直播是否结束并关闭
+
+console.log("🛠️ 子控脚本启动：自动检测直播是否结束");
+
+function logWithTime(message) {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  console.log(`[${hh}:${mm}] ${message}`);
+}
+
+function checkLiveStatusAndCloseIfEnded() {
+  logWithTime("📡 正在检测直播是否结束...");
+
+  const playerWrap = document.querySelector('.player-wrap');
+  const hasLiveVideo = playerWrap?.querySelector('video, iframe');
+  const moreSourceBlock = document.querySelector('.more-source');
+
+  const ended = !hasLiveVideo && moreSourceBlock;
+
+  if (ended) {
+    logWithTime("📴 直播已结束，当前为录像或备用源页面 ❌");
+    window.close(); // ✅ 自动关闭窗口
+  } else {
+    logWithTime("✅ 直播仍在进行中 🎥");
+  }
+}
+
+// ✅ 启动即检查一次
+checkLiveStatusAndCloseIfEnded();
+
+// ✅ 每 10 分钟检测一次
+setInterval(checkLiveStatusAndCloseIfEnded, 10 * 60 * 1000);
+
+
+
+
 // ✅ 启动预设模式：30 秒内无输入 FF 配置，则自动执行默认话术配置
 setTimeout(() => {
   if (!window.__configReady) {
@@ -42,39 +80,32 @@ setTimeout(() => {
 }, 30000);
 
 
-// ✅ 正在检测直播是否结束并关闭
 
-console.log("🛠️ 子控脚本启动：自动检测直播是否结束");
 
-function logWithTime(message) {
-  const now = new Date();
-  const hh = String(now.getHours()).padStart(2, '0');
-  const mm = String(now.getMinutes()).padStart(2, '0');
-  console.log(`[${hh}:${mm}] ${message}`);
-}
 
-function checkLiveStatusAndCloseIfEnded() {
-  logWithTime("📡 正在检测直播是否结束...");
 
-  const playerWrap = document.querySelector('.player-wrap');
-  const hasLiveVideo = playerWrap?.querySelector('video, iframe');
-  const moreSourceBlock = document.querySelector('.more-source');
 
-  const ended = !hasLiveVideo && moreSourceBlock;
 
-  if (ended) {
-    logWithTime("📴 直播已结束，当前为录像或备用源页面 ❌");
-    window.close(); // ✅ 自动关闭窗口
-  } else {
-    logWithTime("✅ 直播仍在进行中 🎥");
-  }
-}
 
-// ✅ 启动即检查一次
-checkLiveStatusAndCloseIfEnded();
 
-// ✅ 每 10 分钟检测一次
-setInterval(checkLiveStatusAndCloseIfEnded, 10 * 60 * 1000);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
