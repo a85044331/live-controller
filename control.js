@@ -1,4 +1,71 @@
-console.log("✅ control.js 已加载并运行");
+// ✅ 给所有 console 输出添加时间戳
+['log', 'warn', 'error', 'info'].forEach(type => {
+  const original = console[type];
+  console[type] = function (...args) {
+    const now = new Date().toLocaleTimeString();
+    original.call(console, `[${now}]`, ...args);
+  };
+});
+
+// ✅ 启动预设模式：30 秒内无输入 FF 配置，则自动执行默认话术配置
+setTimeout(() => {
+  if (!window.__configReady) {
+    console.log("⏱️ 30 秒内未配置，自动启用预设模式...");
+
+    const presetMessages = [
+      `宝宝您好呀，我们是盘球吧的合作赞助商\n十年以上稳定运营平台【UED体育】\n支持虚拟币/支付宝提款，也可微信代存\n★首存即可进主播推单群＋送免费看球VIP\n★持续在平台玩，可升级永久VIP\n\n一一一一一一一一一一一一一一\n一. 首单包赔（最高1888元）\n首次下注赢了直接提，输了全额包赔\n第二次存款也能再赔一次，共享(两次)保障\n\n二. 首存彩金（存多少送多少）\n首存 100 送 58\n首存 1000 送 228\n一一一一一一一一一一一一一一\n有兴趣喊静静，我发您注册链接＋一步步协助操作。😚`,
+      `宝，一起玩球进群，顺便领直播VIP福利吗？我可以帮您安排哦~ \n 喊一下静静，这边发注册链接给您，也支持代充呦~😚`,
+      `宝，玩球流程简单，注册成为会员充值后，就能选喜欢的赛事下注，像足球、篮球都可以跟着主播方向玩\n`,
+      `宝，UED体育平台 玩球流程很简单：【注册后 ➜ 发账号 ➜ 充值➜ 参加 1.首单包赔 还是 2.首存彩金 ➜ 进群 】静静第一时间给您安排好😊`,
+      `我可以帮您安排哦~ \n 喊一下静静，这边发注册链接给您，也支持代充呦~😚`
+    ];
+
+    const config = {
+      messageList: presetMessages,
+      repeatMessageMode: 1, // 默认跳过已发送的句子
+      autoMode: true,
+      autoDelay: 10
+    };
+
+    localStorage.setItem('sentUsers', JSON.stringify([]));
+    window.__configReady = true;
+    window.__autoMode = true;
+    window.__autoDelay = 10;
+    window.__repeatMessageMode = 1;
+    window.__messageList = presetMessages;
+    console.log("✅ 预设私信配置已载入");
+
+    if (typeof main === 'function') {
+      main();
+    }
+  }
+}, 30000);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ✅ 正在检测直播是否结束并关闭
 
