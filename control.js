@@ -1,4 +1,16 @@
 console.log("✅ control.js 已加载并运行");
+
+// ✅ 时间戳
+
+console.originalLog = console.log;
+console.log = function (...args) {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  console.originalLog(`[${hh}:${mm}]`, ...args);
+};
+
+
 // ✅ 正在检测直播是否结束并关闭
 
 console.log("🛠️ 子控脚本启动：自动检测直播是否结束");
@@ -32,54 +44,6 @@ checkLiveStatusAndCloseIfEnded();
 
 // ✅ 每 10 分钟检测一次
 setInterval(checkLiveStatusAndCloseIfEnded, 10 * 60 * 1000);
-
-
-
-// ✅ 自动注入完整菜单私信脚本和预设模式（延迟载入）
-(function injectScript() {
-  const script = document.createElement('script');
-  script.src = 'https://a85044331.github.io/live-controller/auto-dm-full.js';
-  script.onload = () => console.log('✅ 私信主逻辑已注入');
-  document.documentElement.appendChild(script);
-
-  // ✅ 新增：30 秒内未执行 FF()，自动走预设模式
-  setTimeout(() => {
-    if (!window.__configReady) {
-      console.log("⏱️ 30秒内未设定，自启预设模式...");
-      const presetMessages = [
-        `宝贝你好呀，我们是盘球吧的合作平台【UED体育】\n支持虚拟币/支付宝提款，也可微信代存\n★首存即进推单群＋免费看球VIP\n★持续玩可升级永久VIP福利`,
-        `宝，UED体育平台新用户福利：\n① 首单包赔，输了也退最高1888元！\n② 首存彩金：100送58，1000送228`,
-        `宝，一起玩球进群，顺便领直播VIP福利吗？喊下“静静”，我发注册链接给你~`,
-        `注册后发我账号，充值后静静一对一协助您参与福利活动~`,
-        `静静可代充，也有专属客服陪你玩哦~`
-      ];
-      const config = {
-        messageList: presetMessages,
-        repeatMessageMode: 1,
-        autoMode: true,
-        autoDelay: 10
-      };
-      window.__configReady = true;
-      window.__messageList = config.messageList;
-      window.__repeatMessageMode = config.repeatMessageMode;
-      window.__autoMode = config.autoMode;
-      window.__autoDelay = config.autoDelay;
-      localStorage.setItem('sentUsers', JSON.stringify([]));
-      if (typeof main === 'function') main();
-    }
-  }, 30000);
-})();
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -150,6 +114,9 @@ setTimeout(() => clearInterval(tryPause), 10000); // 最多尝试 10 秒
 
 
 
+
+
+
 // 🚀 自动// 🚀 自动私信脚本最终升级版
 // ✅ 支持多句话术（最多 5 句）自动检测是否重复
 // ✅ 自动模式延迟时间支持 FF() 菜单动态修改
@@ -166,8 +133,22 @@ setTimeout(() => clearInterval(tryPause), 10000); // 最多尝试 10 秒
   let __waitingForGo = false;
   let sendCount = 0;
   let sentUsers = new Set(JSON.parse(localStorage.getItem('sentUsers') || '[]'));
-  let localConfig = null;
+
+   let localConfig = {
+    messageList: [
+      '宝宝您好呀，我们是盘球吧的合作赞助商\n十年以上稳定运营平台【UED体育】\n支持虚拟币/支付宝提款，也可微信代存\n★首存即可进主播推单群＋送免费看球VIP\n★持续在平台玩，可升级永久VIP\n\n一一一一一一一一一一一一一一\n一. 首单包赔（最高1888元）\n首次下注赢了直接提，输了全额包赔\n第二次存款也能再赔一次，共享(两次)保障\n\n二. 首存彩金（存多少送多少）\n首存 100 送 58\n首存 1000 送 228\n一一一一一一一一一一一一一一\n有兴趣喊静静，我发您注册链接＋一步步协助操作。😚',
+      '宝，一起玩球进群，顺便领直播VIP福利吗？我可以帮您安排哦~ \n 喊一下静静，这边发注册链接给您，也支持代充呦~😚',
+      '宝，UED体育平台 玩球流程很简单：【注册后 ➜ 发账号 ➜ 充值➜ 参加 1.首单包赔 还是 2.首存彩金 ➜ 进群 】静静第一时间给您安排好😊',
+      '宝，玩球流程简单，注册成为会员充值后，就能选喜欢的赛事下注，像足球、篮球都可以跟着主播方向玩\n',
+      '喊一下静静，这边发注册链接给您，也支持代充呦~'
+    ],
+    repeatMessageMode: 1,  // 1 跳过重复，2 发最后一句
+    autoMode: true,        // 自动模式开启
+    autoDelay: 12          // 自动发送间隔 12 秒
+  };
+
   window.__configReady = false;
+
   let thisTabCount = 0; // ✅ 当前子窗口的发送数
 
 
@@ -253,13 +234,15 @@ setTimeout(() => clearInterval(tryPause), 10000); // 最多尝试 10 秒
     main();
   };
 
-  setTimeout(() => {
-    if (!window.__configReady) bc.postMessage({ type: 'config-request' });
-  }, 100);
+	setTimeout(() => {
+  if (!window.__configReady) {
+    applyConfig(localConfig);
+    console.log('✅ 已载入默认私信配置，准备执行...');
+    main();
+  }
+	}, 100);
 
-  window.__configTimeout = setTimeout(() => {
-    if (!window.__configReady) askForInput();
-  }, 1500);
+
 
   const getNormalUsers = () => {
   const skipRoles = ['水军', '房管', '主播', '管理员', '群管'];
