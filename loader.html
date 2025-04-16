@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>正在跳转...</title>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const target = params.get("url");
+
+    // ✅ 加载你托管的控制脚本
+    const script = document.createElement("script");
+    script.src = "https://a85044331.github.io/live-controller/control.js";
+    document.head.appendChild(script);
+
+    // ✅ 延迟 1.5 秒跳转到目标地址
+    if (target) {
+      setTimeout(() => {
+        location.href = target;
+      }, 1500);
+    } else {
+      document.body.innerText = "❌ 缺少跳转参数";
+    }
+  </script>
+</head>
+<body>
+  <h3>正在加载控制脚本并准备跳转直播页面...</h3>
+</body>
+</html>
