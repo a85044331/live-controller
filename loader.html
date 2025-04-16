@@ -1,44 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>正在加载...</title>
+  <meta charset="utf-8">
+  <title>直播代理加载器</title>
   <style>
-    html, body, iframe {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      border: none;
-      overflow: hidden;
-      background: #000;
-    }
+    html, body, iframe { margin: 0; padding: 0; width: 100%; height: 100%; border: none; }
   </style>
-  <script>
-    const params = new URLSearchParams(location.search);
-    const target = params.get("url");
-
-    // ✅ 加载你的控制脚本
-    const script = document.createElement("script");
-    script.src = "https://a85044331.github.io/live-controller/control.js";
-    document.head.appendChild(script);
-
-    // ✅ 页面加载后插入 iframe
-    window.addEventListener('DOMContentLoaded', () => {
-      if (target) {
-        const iframe = document.createElement('iframe');
-        iframe.src = target;
-        iframe.allow = "autoplay";
-        iframe.style.border = "none";
-        iframe.style.width = "100%";
-        iframe.style.height = "100%";
-        document.body.appendChild(iframe);
-      } else {
-        document.body.innerText = "❌ 缺少跳转参数";
-      }
-    });
-  </script>
 </head>
 <body>
+  <iframe id="liveFrame" sandbox="allow-same-origin allow-scripts allow-forms" allow="autoplay"></iframe>
+
+  <script>
+    const urlParams = new URLSearchParams(location.search);
+    const targetUrl = urlParams.get('url');
+
+    if (targetUrl) {
+      document.getElementById('liveFrame').src = targetUrl;
+      window.parent?.postMessage({ type: 'popupReady', title: document.title, url: targetUrl }, '*');
+    }
+
+    window.addEventListener('beforeunload', () => {
+      window.parent?.postMessage({ type: 'popupClosed', title: document.title, url: targetUrl }, '*');
+    });
+  </script>
 </body>
 </html>
